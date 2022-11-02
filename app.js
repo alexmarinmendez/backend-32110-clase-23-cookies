@@ -4,17 +4,19 @@ const cookieParser = require('cookie-parser')
 const app = express()
 const server = app.listen(8080, () => console.log('Server Up!'))
 
-app.use(cookieParser('c0d3r'))
+app.use(cookieParser())
 app.use(express.json())
 
-app.get('/set-cookie', (req, res) => {
-    res.cookie('oreo', 'Coder was here!', { signed: true }).send({message: "Cookie setted!"})
+app.post('/cookies', (req, res) => {
+    let cookie = req.body // { name: 'oreo', value: 'Coder was here', duration: 5 }
+    if (!cookie.name || !cookie.value || !cookie.duration) return res.send({ err: 'Faltan valores' })
+    res.cookie(cookie.name, cookie.value, { maxAge: cookie.duration*1000}).send({message: 'Galleta creada'})
 })
 
-app.get('/get-cookies', (req, res) => {
-    res.send(req.signedCookies)
+app.get('/cookies', (req, res) => {
+    res.send(req.cookies)
 })
 
-app.get('/clear-cookie', (req, res) => {
-    res.clearCookie('oreo').send({message: 'Cookie deleted!'})
+app.delete('/cookies/:name', (req, res) => {
+    res.clearCookie(req.params.name).send({message: 'Cookie deleted!'})
 })
